@@ -48,6 +48,20 @@ export async function sendSlack(issue) {
 			"pull_request_number": issue.number,
 			"pull_request_title": issue.title
 		};
-		await axios.post(webhookUrl, payload, {});
+
+		try {
+			await axios.post(webhookUrl, payload, {});
+		} catch (err) {
+			if ('toJSON' in err) {
+			  console.error(JSON.stringify(err.toJSON()));
+			}
+			console.error(`Attempted to POST payload: ${JSON.stringify(payload)}`);
+
+			if (err.response) {
+			  core.setFailed(err.response.data);
+			} else {
+			  core.setFailed(err.message);
+			}
+		}
 	}
 }
